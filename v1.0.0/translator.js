@@ -1,7 +1,7 @@
 /*
-//How to Use: https://cdn.foxdim.com/repo/foxdim/libs/translate/1.0.0/translate/
-//Original CDN: https://cdn.foxdim.com/repo/foxdim/libs/translate/1.0.0/translate/translator.js
-//Original MIN JS CDN: https://cdn.foxdim.com/repo/foxdim/libs/translate/1.0.0/translate/translator.min.js
+//How to Use: https://cdn.foxdim.com/repo/foxdim/libs/translate/v1.0.0/translate/
+//Original CDN: https://cdn.foxdim.com/repo/foxdim/libs/translate/v1.0.0/translate/translator.js
+//Original MIN JS CDN: https://cdn.foxdim.com/repo/foxdim/libs/translate/v1.0.0/translate/translator.min.js
 
 FoxLang Widget Usage Examples
 
