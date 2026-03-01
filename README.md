@@ -32,9 +32,16 @@ Lightweight language selector widget with Google Translate integration
 Include the script before `</body>`:
 
 ```html
+<!-- Docs CDN (development) -->
+<script src="https://cdn.foxdim.com/repo/foxdim/libs/translate/"></script>
+```
+
+```html
 <!-- Minified (recommended) -->
 <script src="https://cdn.foxdim.com/repo/foxdim/libs/translate/translator.min.js"></script>
+```
 
+```html
 <!-- Full (development) -->
 <script src="https://cdn.foxdim.com/repo/foxdim/libs/translate/translator.js"></script>
 ```
