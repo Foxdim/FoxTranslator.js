@@ -29,7 +29,7 @@ Lightweight language selector widget with Google Translate integration
 
 ## 📦 Installation
 
-📄 **Docs:** https://cdn.foxdim.com/repo/foxdim/libs/translate/1.0.0/
+📄 **Docs:** https://cdn.foxdim.com/repo/foxdim/libs/translate/v1.0.0/
 
 No npm, no bundler, no setup. Just drop it in.
 
@@ -39,12 +39,12 @@ Include the script before `</body>`:
 
 ```html
 <!-- Minified (recommended) -->
-<script src="https://cdn.foxdim.com/repo/foxdim/libs/translate/1.0.0/translator.min.js"></script>
+<script src="https://cdn.foxdim.com/repo/foxdim/libs/translate/v1.0.0/translator.min.js"></script>
 ```
 
 ```html
 <!-- Full (development) -->
-<script src="https://cdn.foxdim.com/repo/foxdim/libs/translate/1.0.0/translator.js"></script>
+<script src="https://cdn.foxdim.com/repo/foxdim/libs/translate/v1.0.0/translator.js"></script>
 ```
 
 
@@ -64,7 +64,7 @@ Include the script before `</body>`:
     data-class="foxLang"
   ></div>
 
-  <script src="https://cdn.foxdim.com/repo/foxdim/libs/translate/1.0.0/translator.min.js"></script>
+  <script src="https://cdn.foxdim.com/repo/foxdim/libs/translate/v1.0.0/translator.min.js"></script>
 </body>
 </html>
 ```
@@ -241,7 +241,7 @@ window.FoxdimTranslate.restorePage();   // Restore original
 </main>
 
 <!-- Load before </body> -->
-<script src="https://cdn.foxdim.com/repo/foxdim/libs/translate/1.0.0/translator.min.js"></script>
+<script src="https://cdn.foxdim.com/repo/foxdim/libs/translate/v1.0.0/translator.min.js"></script>
 </body>
 </html>
 ```
