@@ -29,12 +29,13 @@ Lightweight language selector widget with Google Translate integration
 
 ## 📦 Installation
 
+📄 **Docs:** https://cdn.foxdim.com/repo/foxdim/libs/translate/
+
+No npm, no bundler, no setup. Just drop it in.
+
+
 Include the script before `</body>`:
 
-```html
-<!-- Docs CDN (development) -->
-<a href="https://cdn.foxdim.com/repo/foxdim/libs/translate/">https://cdn.foxdim.com/repo/foxdim/libs/translate/</a>
-```
 
 ```html
 <!-- Minified (recommended) -->
@@ -46,7 +47,7 @@ Include the script before `</body>`:
 <script src="https://cdn.foxdim.com/repo/foxdim/libs/translate/translator.js"></script>
 ```
 
-No npm, no bundler, no setup. Just drop it in.
+
 
 ---
 
