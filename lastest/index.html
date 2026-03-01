@@ -1,0 +1,851 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>FoxLang Translator — Documentation</title>
+<style>
+  :root {
+    --bg: #0f1117;
+    --bg2: #161b27;
+    --bg3: #1e2535;
+    --border: rgba(255,255,255,0.07);
+    --text: #e2e8f0;
+    --text2: #94a3b8;
+    --text3: #64748b;
+    --accent: #7c3aed;
+    --accent2: #a78bfa;
+    --accent3: rgba(124,58,237,0.12);
+    --accent-border: rgba(124,58,237,0.35);
+    --code-bg: #0d1117;
+    --code-border: rgba(255,255,255,0.07);
+    --tag-bg: rgba(124,58,237,0.15);
+    --tag-text: #c4b5fd;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; }
+  body {
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.7;
+    font-size: 15px;
+  }
+
+  .layout { display: flex; min-height: 100vh; }
+  .sidebar {
+    width: 260px; flex-shrink: 0;
+    background: var(--bg2); border-right: 1px solid var(--border);
+    position: sticky; top: 0; height: 100vh; overflow-y: auto;
+    padding: 28px 0 40px;
+  }
+  .sidebar::-webkit-scrollbar { width: 3px; }
+  .sidebar::-webkit-scrollbar-thumb { background: rgba(124,58,237,0.35); border-radius: 99px; }
+  .sidebar-logo { padding: 0 24px 24px; border-bottom: 1px solid var(--border); margin-bottom: 16px; }
+  .sidebar-logo .version { font-size: 11px; color: var(--text3); margin-top: 2px; }
+  .sidebar-section { padding: 10px 24px 4px; font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.9px; color: var(--text3); }
+  .sidebar a { display: block; padding: 7px 24px; font-size: 13.5px; color: var(--text2); text-decoration: none; border-radius: 0 8px 8px 0; margin-right: 12px; transition: background .14s, color .14s; }
+  .sidebar a:hover { background: var(--accent3); color: var(--accent2); }
+  .sidebar a.active { background: var(--accent3); color: var(--accent2); font-weight: 600; border-left: 2px solid var(--accent); padding-left: 22px; }
+  .main { flex: 1; width: 100%; max-width: none; min-width: 0; padding: 60px 52px 120px; }
+  @media (max-width: 900px) { .sidebar { display: none; } .main { padding: 32px 20px 80px; } }
+
+  h1 { font-size: 36px; font-weight: 800; color: var(--text); letter-spacing: -0.8px; margin-bottom: 12px; }
+  h2 { font-size: 22px; font-weight: 700; color: var(--text); letter-spacing: -0.4px; margin: 56px 0 16px; padding-top: 56px; border-top: 1px solid var(--border); scroll-margin-top: 24px; }
+  h2:first-of-type { border-top: none; margin-top: 32px; }
+  h3 { font-size: 16px; font-weight: 600; color: var(--text); margin: 28px 0 10px; scroll-margin-top: 80px; }
+  p { color: var(--text2); margin-bottom: 14px; }
+  a { color: var(--accent2); text-decoration: none; }
+  a:hover { text-decoration: underline; }
+  strong { color: var(--text); font-weight: 600; }
+
+  .badge { display: inline-block; font-size: 11px; font-weight: 700; letter-spacing: 0.4px; padding: 2px 8px; border-radius: 999px; text-transform: uppercase; }
+  .badge-green { background: rgba(16,185,129,0.12); color: #34d399; border: 1px solid rgba(16,185,129,0.3); }
+  .badge-yellow { background: rgba(245,158,11,0.12); color: #fbbf24; border: 1px solid rgba(245,158,11,0.3); }
+
+  .hero { background: linear-gradient(135deg, rgba(124,58,237,0.12) 0%, rgba(16,185,129,0.06) 100%); border: 1px solid var(--accent-border); border-radius: 14px; padding: 32px; margin-bottom: 40px; }
+  .hero p { margin-bottom: 0; font-size: 15.5px; }
+  .cdn-row { display: flex; align-items: center; gap: 10px; background: var(--code-bg); border: 1px solid var(--code-border); border-radius: 8px; padding: 8px 14px; font-size: 12.5px; font-family: monospace; }
+  .cdn-row .lbl { color: var(--text3); flex-shrink: 0; }
+  .cdn-row .url { color: var(--accent2); word-break: break-all; flex: 1; }
+  .cdn-copy { background: none; border: none; cursor: pointer; color: var(--text3); padding: 2px 6px; border-radius: 4px; font-size: 14px; transition: color .15s; flex-shrink: 0; }
+  .cdn-copy:hover { color: var(--accent2); }
+  .cdn-copy.copied { color: #34d399; }
+
+  /* Code blocks with copy */
+  .pre-wrap { position: relative; margin: 14px 0 20px; }
+  .copy-btn {
+    position: absolute; top: 10px; right: 10px;
+    background: var(--bg3); border: 1px solid var(--border); border-radius: 6px;
+    padding: 4px 11px; font-size: 11px; font-weight: 600; color: var(--text3);
+    cursor: pointer; opacity: 1;
+    transition: opacity .15s, color .15s, background .15s, border-color .15s;
+    letter-spacing: 0.3px;
+  }
+  .copy-btn:hover { color: var(--accent2); background: var(--accent3); border-color: var(--accent-border); opacity: 1; }
+  .copy-btn.copied { opacity: 1; color: #34d399; border-color: rgba(16,185,129,0.35); background: rgba(16,185,129,0.08); }
+  pre { background: var(--code-bg); border: 1px solid var(--code-border); border-radius: 10px; padding: 18px 20px 18px 20px; overflow-x: auto; margin: 0; font-size: 13px; line-height: 1.65; font-family: 'Fira Code','Cascadia Code','Consolas',monospace; }
+  pre::-webkit-scrollbar { height: 4px; }
+  pre::-webkit-scrollbar-thumb { background: rgba(124,58,237,0.35); border-radius: 99px; }
+  code { font-family: 'Fira Code','Cascadia Code','Consolas',monospace; font-size: 13px; }
+  p code, li code, td code { background: rgba(124,58,237,0.12); color: #c4b5fd; padding: 1px 6px; border-radius: 5px; font-size: 12.5px; border: 1px solid rgba(124,58,237,0.22); }
+
+  .t-tag { color: #7dd3fc; } .t-attr { color: #a78bfa; } .t-val { color: #86efac; }
+  .t-str { color: #86efac; } .t-cmt { color: #475569; font-style: italic; }
+  .t-kw { color: #7c3aed; } .t-fn { color: #60a5fa; } .t-prop { color: #a78bfa; }
+
+  .table-wrap { overflow-x: auto; margin: 14px 0 24px; border-radius: 10px; border: 1px solid var(--border); }
+  table { width: 100%; border-collapse: collapse; font-size: 13.5px; }
+  thead tr { background: var(--bg3); }
+  th { padding: 11px 16px; text-align: left; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.7px; color: var(--text3); white-space: nowrap; }
+  td { padding: 10px 16px; border-top: 1px solid var(--border); color: var(--text2); vertical-align: top; }
+  tr:last-child td { border-bottom: none; }
+  tbody tr:hover td { background: rgba(255,255,255,0.017); }
+  td:first-child code { white-space: nowrap; }
+
+  .callout { display: flex; gap: 12px; align-items: flex-start; border-radius: 10px; padding: 14px 16px; margin: 18px 0; font-size: 13.5px; }
+  .callout.install-note { align-items: center; }
+  .callout-icon { font-size: 16px; flex-shrink: 0; margin-top: 1px; }
+  .callout-body { color: var(--text2); }
+  .callout-body strong { color: var(--text); }
+  .callout-body code { overflow-wrap: anywhere; word-break: break-word; }
+  .callout-info { background: rgba(59,130,246,0.08); border: 1px solid rgba(59,130,246,0.2); }
+  .callout-tip { background: rgba(16,185,129,0.08); border: 1px solid rgba(16,185,129,0.22); }
+  .callout-warning { background: rgba(245,158,11,0.08); border: 1px solid rgba(245,158,11,0.22); }
+
+  .steps { counter-reset: step; display: flex; flex-direction: column; gap: 14px; margin: 18px 0 4px; }
+  .step { display: flex; gap: 14px; align-items: flex-start; }
+  .step-num { counter-increment: step; width: 28px; height: 28px; flex-shrink: 0; background: var(--accent3); border: 1px solid var(--accent-border); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 700; color: var(--accent2); }
+  .step-num::after { content: counter(step); }
+  .step-body { padding-top: 4px; color: var(--text2); font-size: 13.5px; }
+  .step-body strong { color: var(--text); }
+
+  .token-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 10px; margin: 14px 0 22px; }
+  .token-card { background: var(--bg3); border: 1px solid var(--border); border-radius: 10px; padding: 14px 16px; }
+  .token-card .tk { font-size: 13px; font-weight: 700; color: var(--accent2); font-family: monospace; margin-bottom: 4px; }
+  .token-card .td { font-size: 12px; color: var(--text3); }
+
+  .opt-yes { color: #34d399; font-weight: 600; }
+  .opt-no { color: #fb7185; font-weight: 600; }
+
+  /* Example: code left + live right */
+  .example-block { display: grid; grid-template-columns: 1fr auto; gap: 16px; align-items: start; margin: 14px 0 24px; }
+  .example-block .pre-wrap { margin: 0; }
+  .example-live { background: var(--bg3); border: 1px solid var(--border); border-radius: 10px; padding: 16px 18px; display: flex; flex-direction: column; align-items: center; gap: 10px; min-width: 130px; flex-shrink: 0; }
+  .example-live-label { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.8px; color: var(--text3); white-space: nowrap; }
+  @media (max-width: 700px) { .example-block { grid-template-columns: 1fr; } }
+
+  hr { border: none; border-top: 1px solid var(--border); margin: 48px 0; }
+  ul { padding-left: 22px; color: var(--text2); margin-bottom: 14px; }
+  ul li { margin-bottom: 5px; }
+
+  .toc-pill { display: inline-flex; align-items: center; gap: 6px; background: var(--bg3); border: 1px solid var(--border); border-radius: 999px; padding: 4px 12px; font-size: 12px; color: var(--text3); margin-bottom: 32px; }
+
+  .mobile-nav {
+    display: none;
+    position: sticky;
+    top: 10px;
+    z-index: 20;
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 10px;
+    margin-bottom: 20px;
+  }
+  .mobile-nav label { display: block; font-size: 11px; color: var(--text3); margin-bottom: 6px; font-weight: 700; letter-spacing: 0.6px; text-transform: uppercase; }
+  .mobile-nav select {
+    width: 100%;
+    background: var(--bg3);
+    border: 1px solid var(--border);
+    color: var(--text2);
+    border-radius: 8px;
+    padding: 9px 10px;
+    font-size: 13px;
+  }
+  @media (max-width: 900px) {
+    .mobile-nav { display: block; }
+  }
+</style>
+</head>
+<body>
+
+<div style="position:fixed;top:14px;right:20px;z-index:9999;">
+  <div data-type="foxLang" data-theme="auto" data-value="TR,EN,DE,FR,RU,AZ,AR"
+    data-selectoption="flag,iso2" data-listoption="flag,iso2,name,en-name"
+    data-option="yes-auto-translate"
+    data-class="foxLangTop" translate="no" class="notranslate" style="display:inline-block;"></div>
+</div>
+
+<div class="layout">
+  <nav class="sidebar">
+    <div class="sidebar-logo">
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:6px;">
+        <img src="https://cdn.foxdim.com/repo/foxdim/files/uploads/logos/foxdim_logo_webp.webp" alt="FOXDIM" style="height:32px;width:32px;object-fit:contain;border-radius:6px;flex-shrink:0;">
+        <span style="font-size:16px;font-weight:700;color:var(--text);letter-spacing:-0.3px;">FOXDIM</span>
+      </div>
+      <div class="version">translator.js — Docs</div>
+    </div>
+    <div class="sidebar-section">Getting Started</div>
+    <a href="#installation">Installation</a>
+    <a href="#cdn">CDN Links</a>
+    <a href="#quickstart">Quick Start</a>
+    <div class="sidebar-section">Widget</div>
+    <a href="#attributes">Attributes</a>
+    <a href="#tokens">Display Tokens</a>
+    <a href="#options">Options</a>
+    <a href="#theme">Theming</a>
+    <div class="sidebar-section">Advanced</div>
+    <a href="#shared-modal">Shared Modal</a>
+    <a href="#auto-translate">Auto Translate</a>
+    <a href="#javascript-api">JavaScript API</a>
+    <div class="sidebar-section">Reference</div>
+    <a href="#examples">Full Examples</a>
+    <a href="#languages">Language Codes</a>
+  </nav>
+
+  <main class="main">
+
+    <h1>translator.js</h1>
+    <div class="toc-pill">Documentation · FOXDIM</div>
+    <div class="toc-pill">Powered by · Google </div>
+    <div class="toc-pill">Ver 1.0.0</div>
+    <div class="toc-pill">Updated: 01.03.2026</div>
+    <div class="mobile-nav">
+      <label for="doc-mobile-menu">Sections</label>
+      <select id="doc-mobile-menu" onchange="if(this.value){window.location.hash=this.value;}">
+        <option value="">Go to section...</option>
+        <option value="installation">Installation</option>
+        <option value="quickstart">Quick Start</option>
+        <option value="attributes">Attributes</option>
+        <option value="tokens">Display Tokens</option>
+        <option value="options">Options</option>
+        <option value="theme">Theming</option>
+        <option value="shared-modal">Shared Modal</option>
+        <option value="auto-translate">Auto Translate</option>
+        <option value="javascript-api">JavaScript API</option>
+        <option value="examples">Full Examples</option>
+        <option value="languages">Language Codes</option>
+        <option value="cdn">CDN Links</option>
+      </select>
+    </div>
+
+    <div class="hero">
+      <p>A lightweight, zero-dependency language selector widget with built-in <strong>Google Translate</strong> integration. Drop a single <code>&lt;div&gt;</code> into your page — no frameworks, no build step required.</p>
+      <p style="margin-top:10px;margin-bottom:0;font-size:13px;color:var(--text3);display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
+        <img src="https://cdn.foxdim.com/repo/foxdim/files/uploads/logos/foxdim_logo_webp.webp" alt="FOXDIM" style="height:14px;width:14px;object-fit:contain;border-radius:3px;">
+        <span>Made by <strong style="color:var(--accent2)">FOXDIM</strong></span>
+        <span>&nbsp;·&nbsp;</span>
+        <a href="https://www.foxdim.com" target="_blank" rel="noopener" style="color:var(--accent2);font-weight:600;">www.foxdim.com</a>
+        <span>&nbsp;·&nbsp;</span>
+        <img src="https://www.gstatic.com/images/branding/googlelogo/svg/googlelogo_clr_74x24px.svg" alt="Google" style="height:12px;width:auto;object-fit:contain;">
+        <span>Translation powered by <strong style="color:var(--text2)">Google Translate</strong></span>
+      </p>
+    </div>
+
+    <!-- Installation -->
+    <h2 id="installation">Installation</h2>
+    <p>Include the script anywhere in your HTML — before <code>&lt;/body&gt;</code> is recommended. The widget initializes automatically on <code>DOMContentLoaded</code>.</p>
+    <div class="pre-wrap">
+      <button class="copy-btn" onclick="copyPre(this)">⎘ Copy</button>
+      <pre><span class="t-cmt">&lt;!-- Minified (recommended for production) --&gt;</span>
+<span class="t-tag">&lt;script</span> <span class="t-attr">src</span>=<span class="t-val">"https://cdn.foxdim.com/repo/foxdim/libs/translate/lastest/translator.min.js"</span><span class="t-tag">&gt;&lt;/script&gt;</span></pre>
+    </div>
+    <div class="callout callout-tip install-note">
+      <span class="callout-icon">✅</span>
+      <div class="callout-body">No other dependencies are required. jQuery, React, Vue — none are needed.</div>
+    </div>
+    <div class="callout callout-info install-note">
+      <span class="callout-icon">🌐</span>
+      <div class="callout-body">Set <code>&lt;html lang="..."&gt;</code> correctly (e.g. <code>en</code>, <code>tr</code>, <code>de</code>) for proper translation behavior; if missing/invalid, the library falls back to <strong>English (<code>en</code>)</strong>.</div>
+    </div>
+    <h3 id="cdn">CDN Links</h3>
+    <div class="table-wrap">
+      <div class="cdn-row">
+        <span class="lbl">Minified CDN</span>
+        <span class="url">https://cdn.foxdim.com/repo/foxdim/libs/translate/lastest/translator.min.js</span>
+        <button class="cdn-copy" onclick="copyText('https://cdn.foxdim.com/repo/foxdim/libs/translate/lastest/translator.min.js', this)">⎘ Copy</button>
+      </div>
+      <div class="cdn-row">
+        <span class="lbl">Full CDN</span>
+        <span class="url">https://cdn.foxdim.com/repo/foxdim/libs/translate/lastest/translator.js</span>
+        <button class="cdn-copy" onclick="copyText('https://cdn.foxdim.com/repo/foxdim/libs/translate/lastest/translator.js', this)">⎘ Copy</button>
+      </div>
+      <div class="cdn-row">
+        <span class="lbl">Docs CDN</span>
+        <span class="url">https://cdn.foxdim.com/repo/foxdim/libs/translate/lastest/</span>
+        <button class="cdn-copy" onclick="copyText('https://cdn.foxdim.com/repo/foxdim/libs/translate/lastest/', this)">⎘ Copy</button>
+      </div>
+    </div>
+
+    <!-- Quick Start -->
+    <h2 id="quickstart">Quick Start</h2>
+    <p>Place a <code>&lt;div&gt;</code> with <code>data-type="foxLang"</code> wherever you want the selector to appear.</p>
+    <div class="pre-wrap">
+      <button class="copy-btn" onclick="copyPre(this)">⎘ Copy</button>
+      <pre><span class="t-tag">&lt;div</span>
+  <span class="t-attr">data-type</span>=<span class="t-val">"foxLang"</span>
+  <span class="t-attr">data-value</span>=<span class="t-val">"TR,EN,DE"</span>
+  <span class="t-attr">data-class</span>=<span class="t-val">"foxLang"</span>
+<span class="t-tag">&gt;&lt;/div&gt;</span></pre>
+    </div>
+    <p>That's all. The widget renders a button with the current language flag + name. Clicking it opens a searchable modal with all supported languages.</p>
+    <div class="callout callout-info">
+      <span class="callout-icon">ℹ️</span>
+      <div class="callout-body">The last selected language is saved in <strong>localStorage</strong> and restored on the next page load automatically.</div>
+    </div>
+    <div class="callout callout-info">
+      <span class="callout-icon">🌐</span>
+      <div class="callout-body">In the language modal, the original document language is placed at the top and marked as <strong>Original Language</strong>.</div>
+    </div>
+
+    <!-- Attributes -->
+    <h2 id="attributes">Attributes</h2>
+    <p>All configuration is done through HTML <code>data-</code> attributes on the widget element.</p>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Attribute</th><th>Required</th><th>Default</th><th>Description</th></tr></thead>
+        <tbody>
+          <tr><td><code>data-type="foxLang"</code></td><td><span class="opt-yes">Yes</span></td><td>—</td><td>Marks the element as a FoxLang widget. Required for auto-initialization.</td></tr>
+          <tr><td><code>data-value</code></td><td><span class="opt-yes">Yes</span></td><td><code>tr,en</code></td><td>Comma-separated list of language codes shown in the "Quick Select" section of the modal (e.g. <code>TR,EN,DE,FR</code>).</td></tr>
+          <tr><td><code>data-class</code></td><td><span class="opt-yes">Yes</span></td><td><code>foxLang</code></td><td>CSS class prefix for all widget elements <em>and</em> the localStorage key prefix. Multiple widgets with the same value share one modal and stay in sync.</td></tr>
+          <tr><td><code>data-theme</code></td><td>No</td><td><code>auto</code></td><td>Widget color scheme: <code>light</code>, <code>dark</code>, or <code>auto</code>. In <code>auto</code> mode the theme is read from the page and updates live.</td></tr>
+          <tr><td><code>data-selectoption</code></td><td>No</td><td><code>flag,name</code></td><td>Comma-separated tokens controlling what appears on the <strong>closed selector button</strong> (e.g. <code>flag,iso2,name,en-name</code>). See <a href="#tokens">Display Tokens</a>.</td></tr>
+          <tr><td><code>data-listoption</code></td><td>No</td><td><code>flag,name,en-name</code></td><td>Comma-separated tokens controlling what appears in each <strong>modal list row</strong>. See <a href="#tokens">Display Tokens</a>.</td></tr>
+          <tr><td><code>data-option</code></td><td>No</td><td>—</td><td>Comma-separated behaviour flags. See <a href="#options">Options</a>.</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Display Tokens -->
+    <h2 id="tokens">Display Tokens</h2>
+    <p>Tokens define <strong>what is rendered</strong> in the selector button (<code>data-selectoption</code>) and in each row of the modal list (<code>data-listoption</code>). They are rendered in the order you specify.</p>
+    <div class="token-grid">
+      <div class="token-card"><div class="tk">flag</div><div class="td">Country/language flag SVG icon</div></div>
+      <div class="token-card"><div class="tk">iso2</div><div class="td">2-letter code badge (e.g. <strong>TR</strong>, <strong>EN</strong>)</div></div>
+      <div class="token-card"><div class="tk">name</div><div class="td">Native name (e.g. Türkçe, Deutsch)</div></div>
+      <div class="token-card"><div class="tk">en-name</div><div class="td">English name in parentheses (e.g. (Turkish))</div></div>
+    </div>
+
+    <h3>Token examples</h3>
+    <div class="pre-wrap">
+      <button class="copy-btn" onclick="copyPre(this)">⎘ Copy</button>
+      <pre><span class="t-cmt">&lt;!-- Selector: show only flag --&gt;</span>
+<span class="t-attr">data-selectoption</span>=<span class="t-val">"flag"</span>
+
+<span class="t-cmt">&lt;!-- Selector: compact flag + iso2 badge --&gt;</span>
+<span class="t-attr">data-selectoption</span>=<span class="t-val">"flag,iso2"</span>
+
+<span class="t-cmt">&lt;!-- Selector: flag + native name --&gt;</span>
+<span class="t-attr">data-selectoption</span>=<span class="t-val">"flag,name"</span>
+
+<span class="t-cmt">&lt;!-- Selector: full detail — tüm token'lar --&gt;</span>
+<span class="t-attr">data-selectoption</span>=<span class="t-val">"flag,iso2,name,en-name"</span>
+
+<span class="t-cmt">&lt;!-- Modal list: full info --&gt;</span>
+<span class="t-attr">data-listoption</span>=<span class="t-val">"flag,iso2,name,en-name"</span>
+
+<span class="t-cmt">&lt;!-- Modal list: minimal --&gt;</span>
+<span class="t-attr">data-listoption</span>=<span class="t-val">"flag,name"</span></pre>
+    </div>
+    <div class="callout callout-tip">
+      <span class="callout-icon">💡</span>
+      <div class="callout-body">When <code>data-selectoption</code> is exactly <code>flag,iso2</code>, the selector button automatically switches to a <strong>compact style</strong> with tighter padding — perfect for tight navigation bars.</div>
+    </div>
+
+    <!-- Options -->
+    <h2 id="options">Options (<code>data-option</code>)</h2>
+    <p>Behaviour flags are set as a comma-separated list in <code>data-option</code>.</p>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Flag</th><th>Description</th></tr></thead>
+        <tbody>
+          <tr><td><code>no-flags</code></td><td>Hides all flag SVGs everywhere (selector button and modal list). Useful for text-only UIs.</td></tr>
+          <tr><td><code>yes-auto-translate</code></td><td>On first load (no saved preference), automatically selects the visitor's browser language if it is a supported language.</td></tr>
+          <tr><td><code>yes-first-lang-browser</code></td><td>Moves the visitor's browser language to the top of the "Quick Select" group in the modal, regardless of <code>data-value</code> order.</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="pre-wrap">
+      <button class="copy-btn" onclick="copyPre(this)">⎘ Copy</button>
+      <pre><span class="t-tag">&lt;div</span>
+  <span class="t-attr">data-type</span>=<span class="t-val">"foxLang"</span>
+  <span class="t-attr">data-value</span>=<span class="t-val">"TR,EN,DE,FR"</span>
+  <span class="t-attr">data-option</span>=<span class="t-val">"yes-auto-translate,yes-first-lang-browser"</span>
+  <span class="t-attr">data-class</span>=<span class="t-val">"foxLang"</span>
+<span class="t-tag">&gt;&lt;/div&gt;</span></pre>
+    </div>
+
+    <!-- Theme -->
+    <h2 id="theme">Theming</h2>
+    <p>Set <code>data-theme</code> to control the widget's color scheme.</p>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Value</th><th>Behaviour</th></tr></thead>
+        <tbody>
+          <tr><td><code>light</code></td><td>Always uses the light color scheme.</td></tr>
+          <tr><td><code>dark</code></td><td>Always uses the dark color scheme.</td></tr>
+          <tr><td><code>auto</code> <span class="badge badge-green">default</span></td><td>Reads the current theme from the page and <strong>reacts live to changes</strong>. Detection priority below.</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <h3>Auto-detection priority</h3>
+    <p>When <code>data-theme="auto"</code>, the following sources are checked in order:</p>
+    <div class="steps">
+      <div class="step"><div class="step-num"></div><div class="step-body"><strong><code>html[theme="dark|light"]</code></strong> — custom attribute</div></div>
+      <div class="step"><div class="step-num"></div><div class="step-body"><strong><code>html[data-theme="dark|light"]</code></strong> — common SPA convention</div></div>
+      <div class="step"><div class="step-num"></div><div class="step-body"><strong><code>html[data-bs-theme="dark|light"]</code></strong> — Bootstrap 5</div></div>
+      <div class="step"><div class="step-num"></div><div class="step-body"><strong><code>html.classList</code></strong> — contains <code>dark</code> or <code>light</code> class</div></div>
+      <div class="step"><div class="step-num"></div><div class="step-body"><strong><code>prefers-color-scheme</code></strong> — OS/browser system preference</div></div>
+    </div>
+    <div class="pre-wrap">
+      <button class="copy-btn" onclick="copyPre(this)">⎘ Copy</button>
+      <pre><span class="t-cmt">&lt;!-- These are all recognized by auto mode --&gt;</span>
+<span class="t-tag">&lt;html</span> <span class="t-attr">theme</span>=<span class="t-val">"dark"</span><span class="t-tag">&gt;</span>
+<span class="t-tag">&lt;html</span> <span class="t-attr">data-theme</span>=<span class="t-val">"dark"</span><span class="t-tag">&gt;</span>
+<span class="t-tag">&lt;html</span> <span class="t-attr">data-bs-theme</span>=<span class="t-val">"dark"</span><span class="t-tag">&gt;</span>
+<span class="t-tag">&lt;html</span> <span class="t-attr">class</span>=<span class="t-val">"dark"</span><span class="t-tag">&gt;</span></pre>
+    </div>
+    <div class="callout callout-tip">
+      <span class="callout-icon">⚡</span>
+      <div class="callout-body"><code>auto</code> mode uses <strong>MutationObserver</strong> on <code>&lt;html&gt;</code> and listens to <code>matchMedia</code> changes — the widget theme updates instantly without a page reload.</div>
+    </div>
+
+    <!-- Shared Modal -->
+    <h2 id="shared-modal">Shared Modal (Multiple Widgets)</h2>
+    <p>When you place multiple widgets with the <strong>same <code>data-class</code></strong> value, they share a single modal and a single localStorage key. Selecting a language in one widget instantly updates <em>all</em> of them.</p>
+    <div class="example-block">
+    <div class="pre-wrap">
+      <button class="copy-btn" onclick="copyPre(this)">⎘ Copy</button>
+      <pre><span class="t-cmt">&lt;!-- Widget in the top navbar --&gt;</span>
+<span class="t-tag">&lt;div</span>
+  <span class="t-attr">data-type</span>=<span class="t-val">"foxLang"</span>
+  <span class="t-attr">data-value</span>=<span class="t-val">"TR,EN,DE"</span>
+  <span class="t-attr">data-selectoption</span>=<span class="t-val">"flag,iso2"</span>
+  <span class="t-attr">data-class</span>=<span class="t-val">"foxLang"</span>
+<span class="t-tag">&gt;&lt;/div&gt;</span>
+
+<span class="t-cmt">&lt;!-- Widget in the sidebar — same data-class, same modal --&gt;</span>
+<span class="t-tag">&lt;div</span>
+  <span class="t-attr">data-type</span>=<span class="t-val">"foxLang"</span>
+  <span class="t-attr">data-value</span>=<span class="t-val">"TR,EN,DE"</span>
+  <span class="t-attr">data-selectoption</span>=<span class="t-val">"flag,name"</span>
+  <span class="t-attr">data-class</span>=<span class="t-val">"foxLang"</span>
+<span class="t-tag">&gt;&lt;/div&gt;</span></pre>
+      </div>
+      <div class="example-live">
+        <span class="example-live-label">▶ Live</span>
+        <div data-type="foxLang" data-theme="auto" data-value="TR,EN,DE" data-selectoption="flag,iso2" data-listoption="flag,iso2,name,en-name" data-class="sharedModalDemo" translate="no" class="notranslate"></div>
+        <div data-type="foxLang" data-theme="auto" data-value="TR,EN,DE" data-selectoption="flag,name" data-listoption="flag,iso2,name,en-name" data-class="sharedModalDemo" translate="no" class="notranslate"></div>
+      </div>
+    </div>
+    <div class="callout callout-info">
+      <span class="callout-icon">ℹ️</span>
+      <div class="callout-body">
+        <strong>Each <code>data-class</code> value creates one modal.</strong> Widgets sharing the same <code>data-class</code> register render callbacks, so selecting a language updates all of them at the same time.
+        For independent widgets with separate modals and separate localStorage, use different values such as <code>foxLang1</code> and <code>foxLang2</code>.
+      </div>
+    </div>
+
+    <!-- Auto Translate -->
+    <h2 id="auto-translate">Auto Translate (Google Translate)</h2>
+    <p>The library ships with a <code>FoxdimTranslate</code> class that wraps Google Translate. When a language is selected in the widget, <code>FoxdimTranslate.setLang()</code> is called automatically if it is present on the page.</p>
+    <h3>How it works</h3>
+    <div class="steps">
+      <div class="step"><div class="step-num"></div><div class="step-body">User clicks a language in the modal.</div></div>
+      <div class="step"><div class="step-num"></div><div class="step-body"><code>FoxLangSelect.onChange(lang)</code> fires — calls <code>window.FoxdimTranslate.setLang(lang)</code>.</div></div>
+      <div class="step"><div class="step-num"></div><div class="step-body"><code>FoxdimTranslate</code> injects the Google Translate script if not already loaded, then triggers the language change.</div></div>
+      <div class="step"><div class="step-num"></div><div class="step-body">The Google Translate top-bar is automatically hidden.</div></div>
+    </div>
+    <div class="pre-wrap">
+      <button class="copy-btn" onclick="copyPre(this)">⎘ Copy</button>
+      <pre><span class="t-cmt">// Manual trigger via JS (no widget click needed)</span>
+<span class="t-fn">window.FoxdimTranslate</span>.<span class="t-fn">setLang</span>(<span class="t-str">'de'</span>);   <span class="t-cmt">// Translate page to German</span>
+<span class="t-fn">window.FoxdimTranslate</span>.<span class="t-fn">restorePage</span>();    <span class="t-cmt">// Restore to original language</span></pre>
+    </div>
+
+    <!-- JS API -->
+    <h2 id="javascript-api">JavaScript API</h2>
+    <p>Both classes are exposed on <code>window</code> after <code>DOMContentLoaded</code>.</p>
+    <h3><code>window.FoxLangSelect</code></h3>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Method / Property</th><th>Description</th></tr></thead>
+        <tbody>
+          <tr><td><code>.registry</code></td><td>Object keyed by <code>data-class</code> prefix. Holds shared state (selected lang, renderers, modal references) for each widget group.</td></tr>
+          <tr><td><code>.resolveLang(raw)</code></td><td>Normalizes a raw language string (e.g. <code>"EN"</code>, <code>"en-US"</code>) to the internal key used by the widget.</td></tr>
+          <tr><td><code>.resolveTheme(raw)</code></td><td>Returns <code>"dark"</code> or <code>"light"</code> by reading the current page theme. Evaluates all detection sources.</td></tr>
+          <tr><td><code>.onChange(lang)</code></td><td>Called after every language change. Override to add custom behavior.</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <h3><code>window.FoxdimTranslate</code></h3>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Method</th><th>Description</th></tr></thead>
+        <tbody>
+          <tr><td><code>.setLang(lang)</code></td><td>Translates the page to the given language code. Injects Google Translate if needed.</td></tr>
+          <tr><td><code>.restorePage()</code></td><td>Removes Google Translate and restores the original page content.</td></tr>
+          <tr><td><code>.getPageLang()</code></td><td>Returns an object <code>{ page_lang, browser_lang }</code> with the current <code>&lt;html lang&gt;</code> and navigator language.</td></tr>
+          <tr><td><code>.hideGoogleTopbar()</code></td><td>Hides the Google Translate floating topbar. Called automatically on translation.</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="pre-wrap">
+      <button class="copy-btn" onclick="copyPre(this)">⎘ Copy</button>
+      <pre><span class="t-cmt">// Custom onChange hook — e.g. send analytics event</span>
+<span class="t-fn">window.FoxLangSelect</span>.<span class="t-prop">onChange</span> = <span class="t-kw">function</span>(lang) {
+  console.<span class="t-fn">log</span>(<span class="t-str">'Language changed to:'</span>, lang);
+  <span class="t-fn">gtag</span>(<span class="t-str">'event'</span>, <span class="t-str">'language_change'</span>, { language: lang });
+};</pre>
+    </div>
+
+    <!-- ─── EXAMPLES ─── -->
+    <h2 id="examples">Full Examples</h2>
+    <p>Her örneğin yanında tıklanabilir <strong>canlı widget</strong> var. Kodu kopyala, widget'a tıkla, dene.</p>
+
+    <!-- Ex 1: Minimal -->
+    <h3>1 — Minimal selector</h3>
+    <div class="example-block">
+      <div class="pre-wrap">
+        <button class="copy-btn" onclick="copyPre(this)">⎘ Copy</button>
+        <pre><span class="t-tag">&lt;script</span> <span class="t-attr">src</span>=<span class="t-val">"...translator.min.js"</span><span class="t-tag">&gt;&lt;/script&gt;</span>
+
+<span class="t-tag">&lt;div</span>
+  <span class="t-attr">data-type</span>=<span class="t-val">"foxLang"</span>
+  <span class="t-attr">data-value</span>=<span class="t-val">"TR,EN,DE"</span>
+  <span class="t-attr">data-class</span>=<span class="t-val">"foxLang"</span>
+<span class="t-tag">&gt;&lt;/div&gt;</span></pre>
+      </div>
+      <div class="example-live">
+        <span class="example-live-label">▶ Live</span>
+        <div data-type="foxLang" data-theme="auto" data-value="TR,EN,DE" data-class="ex1" translate="no" class="notranslate"></div>
+      </div>
+    </div>
+
+    <!-- Ex 2: flag,iso2 -->
+    <h3>2 — Compact navbar: <code>flag,iso2</code></h3>
+    <p>Auto-compact padding aktif olur — dar navbar'lar için ideal.</p>
+    <div class="example-block">
+      <div class="pre-wrap">
+        <button class="copy-btn" onclick="copyPre(this)">⎘ Copy</button>
+        <pre><span class="t-tag">&lt;div</span>
+  <span class="t-attr">data-type</span>=<span class="t-val">"foxLang"</span>
+  <span class="t-attr">data-value</span>=<span class="t-val">"TR,EN,DE,FR,RU"</span>
+  <span class="t-attr">data-theme</span>=<span class="t-val">"auto"</span>
+  <span class="t-attr">data-selectoption</span>=<span class="t-val">"flag,iso2"</span>
+  <span class="t-attr">data-listoption</span>=<span class="t-val">"flag,iso2,name,en-name"</span>
+  <span class="t-attr">data-class</span>=<span class="t-val">"foxLang"</span>
+  <span class="t-attr">translate</span>=<span class="t-val">"no"</span> <span class="t-attr">class</span>=<span class="t-val">"notranslate"</span>
+<span class="t-tag">&gt;&lt;/div&gt;</span></pre>
+      </div>
+      <div class="example-live">
+        <span class="example-live-label">▶ Live</span>
+        <div data-type="foxLang" data-theme="auto" data-value="TR,EN,DE,FR,RU" data-selectoption="flag,iso2" data-listoption="flag,iso2,name,en-name" data-class="ex2" translate="no" class="notranslate"></div>
+      </div>
+    </div>
+
+    <!-- Ex 3: flag,name -->
+    <h3>3 — Flag + native name: <code>flag,name</code></h3>
+    <div class="example-block">
+      <div class="pre-wrap">
+        <button class="copy-btn" onclick="copyPre(this)">⎘ Copy</button>
+        <pre><span class="t-tag">&lt;div</span>
+  <span class="t-attr">data-type</span>=<span class="t-val">"foxLang"</span>
+  <span class="t-attr">data-value</span>=<span class="t-val">"TR,EN,DE,FR,AR,RU,AZ"</span>
+  <span class="t-attr">data-theme</span>=<span class="t-val">"auto"</span>
+  <span class="t-attr">data-selectoption</span>=<span class="t-val">"flag,name"</span>
+  <span class="t-attr">data-listoption</span>=<span class="t-val">"flag,iso2,name,en-name"</span>
+  <span class="t-attr">data-option</span>=<span class="t-val">"yes-auto-translate,yes-first-lang-browser"</span>
+  <span class="t-attr">data-class</span>=<span class="t-val">"foxLang"</span>
+  <span class="t-attr">translate</span>=<span class="t-val">"no"</span> <span class="t-attr">class</span>=<span class="t-val">"notranslate"</span>
+<span class="t-tag">&gt;&lt;/div&gt;</span></pre>
+      </div>
+      <div class="example-live">
+        <span class="example-live-label">▶ Live</span>
+        <div data-type="foxLang" data-theme="auto" data-value="TR,EN,DE,FR,AR,RU,AZ" data-selectoption="flag,name" data-listoption="flag,iso2,name,en-name" data-option="yes-auto-translate" data-class="ex3" translate="no" class="notranslate"></div>
+      </div>
+    </div>
+
+    <!-- Ex 4: flag only -->
+    <h3>4 — Flag only: <code>flag</code></h3>
+    <p>Sadece bayrak — topbar ve meta bar'larda <code>display:inline-block</code> ile kullanmak için ideal.</p>
+    <div class="example-block">
+      <div class="pre-wrap">
+        <button class="copy-btn" onclick="copyPre(this)">⎘ Copy</button>
+        <pre><span class="t-tag">&lt;div</span>
+  <span class="t-attr">data-type</span>=<span class="t-val">"foxLang"</span>
+  <span class="t-attr">data-theme</span>=<span class="t-val">"auto"</span>
+  <span class="t-attr">data-value</span>=<span class="t-val">"TR,EN,DE,FR,RU,AZ,AR"</span>
+  <span class="t-attr">data-selectoption</span>=<span class="t-val">"flag"</span>
+  <span class="t-attr">data-listoption</span>=<span class="t-val">"flag,iso2,name,en-name"</span>
+  <span class="t-attr">data-option</span>=<span class="t-val">"yes-auto-translate,yes-first-lang-browser"</span>
+  <span class="t-attr">data-class</span>=<span class="t-val">"foxLang"</span>
+  <span class="t-attr">translate</span>=<span class="t-val">"no"</span> <span class="t-attr">class</span>=<span class="t-val">"notranslate"</span>
+  <span class="t-attr">style</span>=<span class="t-val">"display:inline-block;margin-right:8px;"</span>
+<span class="t-tag">&gt;&lt;/div&gt;</span></pre>
+      </div>
+      <div class="example-live">
+        <span class="example-live-label">▶ Live</span>
+        <div data-type="foxLang" data-theme="auto" data-value="TR,EN,DE,FR,RU,AZ,AR" data-selectoption="flag" data-listoption="flag,iso2,name,en-name" data-option="yes-auto-translate" data-class="ex4" translate="no" class="notranslate" style="display:inline-block;"></div>
+      </div>
+    </div>
+
+    <!-- Ex 5: flag,iso2,name,en-name — THE MISSING ONE -->
+    <h3>5 — Full detail: <code>flag,iso2,name,en-name</code></h3>
+    <p>Tüm token'lar aynı anda aktif — bayrak, ISO kodu, yerel isim ve İngilizce isim birlikte gösterilir. Kullanıcının hangi dili seçtiğini en net şekilde aktarmak istediğinde kullan.</p>
+    <div class="example-block">
+      <div class="pre-wrap">
+        <button class="copy-btn" onclick="copyPre(this)">⎘ Copy</button>
+        <pre><span class="t-tag">&lt;div</span>
+  <span class="t-attr">data-type</span>=<span class="t-val">"foxLang"</span>
+  <span class="t-attr">data-theme</span>=<span class="t-val">"auto"</span>
+  <span class="t-attr">data-value</span>=<span class="t-val">"TR,EN,DE,FR"</span>
+  <span class="t-attr">data-selectoption</span>=<span class="t-val">"flag,iso2,name,en-name"</span>
+  <span class="t-attr">data-listoption</span>=<span class="t-val">"flag,iso2,name,en-name"</span>
+  <span class="t-attr">data-option</span>=<span class="t-val">"yes-auto-translate,yes-first-lang-browser"</span>
+  <span class="t-attr">data-class</span>=<span class="t-val">"foxLang"</span>
+  <span class="t-attr">translate</span>=<span class="t-val">"no"</span> <span class="t-attr">class</span>=<span class="t-val">"notranslate"</span>
+<span class="t-tag">&gt;&lt;/div&gt;</span></pre>
+      </div>
+      <div class="example-live">
+        <span class="example-live-label">▶ Live</span>
+        <div data-type="foxLang" data-theme="auto" data-value="TR,EN,DE,FR" data-selectoption="flag,iso2,name,en-name" data-listoption="flag,iso2,name,en-name" data-option="yes-auto-translate" data-class="ex5" translate="no" class="notranslate"></div>
+      </div>
+    </div>
+
+    <!-- Ex 6: no-flags -->
+    <h3>6 — No flags, text only: <code>iso2,name</code></h3>
+    <div class="example-block">
+      <div class="pre-wrap">
+        <button class="copy-btn" onclick="copyPre(this)">⎘ Copy</button>
+        <pre><span class="t-tag">&lt;div</span>
+  <span class="t-attr">data-type</span>=<span class="t-val">"foxLang"</span>
+  <span class="t-attr">data-value</span>=<span class="t-val">"TR,EN,DE"</span>
+  <span class="t-attr">data-selectoption</span>=<span class="t-val">"iso2,name"</span>
+  <span class="t-attr">data-listoption</span>=<span class="t-val">"iso2,name,en-name"</span>
+  <span class="t-attr">data-option</span>=<span class="t-val">"no-flags"</span>
+  <span class="t-attr">data-class</span>=<span class="t-val">"foxLang"</span>
+  <span class="t-attr">translate</span>=<span class="t-val">"no"</span> <span class="t-attr">class</span>=<span class="t-val">"notranslate"</span>
+<span class="t-tag">&gt;&lt;/div&gt;</span></pre>
+      </div>
+      <div class="example-live">
+        <span class="example-live-label">▶ Live</span>
+        <div data-type="foxLang" data-theme="auto" data-value="TR,EN,DE" data-selectoption="iso2,name" data-listoption="iso2,name,en-name" data-option="no-flags" data-class="ex6" translate="no" class="notranslate"></div>
+      </div>
+    </div>
+
+    <!-- Ex 7: synced -->
+    <h3>7 — Two synced widgets (navbar + sidebar)</h3>
+    <p>Aynı <code>data-class</code>'ı paylaşan iki widget — birinden dil seçince diğeri anında güncellenir.</p>
+    <div class="example-block">
+      <div class="pre-wrap">
+        <button class="copy-btn" onclick="copyPre(this)">⎘ Copy</button>
+        <pre><span class="t-cmt">&lt;!-- Navbar: compact --&gt;</span>
+<span class="t-tag">&lt;div</span>
+  <span class="t-attr">data-type</span>=<span class="t-val">"foxLang"</span>
+  <span class="t-attr">data-value</span>=<span class="t-val">"TR,EN,DE,FR"</span>
+  <span class="t-attr">data-selectoption</span>=<span class="t-val">"flag,iso2"</span>
+  <span class="t-attr">data-class</span>=<span class="t-val">"foxLang"</span>
+<span class="t-tag">&gt;&lt;/div&gt;</span>
+
+<span class="t-cmt">&lt;!-- Sidebar: full name — same class --&gt;</span>
+<span class="t-tag">&lt;div</span>
+  <span class="t-attr">data-type</span>=<span class="t-val">"foxLang"</span>
+  <span class="t-attr">data-value</span>=<span class="t-val">"TR,EN,DE,FR"</span>
+  <span class="t-attr">data-selectoption</span>=<span class="t-val">"flag,name"</span>
+  <span class="t-attr">data-class</span>=<span class="t-val">"foxLang"</span>
+<span class="t-tag">&gt;&lt;/div&gt;</span></pre>
+      </div>
+      <div class="example-live">
+        <span class="example-live-label">▶ Live (synced)</span>
+        <div data-type="foxLang" data-theme="auto" data-value="TR,EN,DE,FR" data-selectoption="flag,iso2" data-class="ex7" translate="no" class="notranslate"></div>
+        <div data-type="foxLang" data-theme="auto" data-value="TR,EN,DE,FR" data-selectoption="flag,name" data-class="ex7" translate="no" class="notranslate"></div>
+      </div>
+    </div>
+
+    <!-- Ex 8: production template -->
+    <h3>8 — Full production template</h3>
+    <p style="color:var(--text3);font-size:13px;margin-top:-6px;margin-bottom:16px;">A realistic starter page: proper <code>&lt;head&gt;</code> meta tags, a styled navbar with logo + links + language switcher, a hero section, and the translator script loaded before <code>&lt;/body&gt;</code>.</p>
+    <div class="pre-wrap">
+      <button class="copy-btn" onclick="copyPre(this)">⎘ Copy</button>
+      <pre><span class="t-tag">&lt;!DOCTYPE html&gt;</span>
+<span class="t-tag">&lt;html</span> <span class="t-attr">lang</span>=<span class="t-val">"en"</span> <span class="t-attr">data-theme</span>=<span class="t-val">"dark"</span><span class="t-tag">&gt;</span>
+<span class="t-tag">&lt;head&gt;</span>
+  <span class="t-tag">&lt;meta</span> <span class="t-attr">charset</span>=<span class="t-val">"UTF-8"</span><span class="t-tag">&gt;</span>
+  <span class="t-tag">&lt;meta</span> <span class="t-attr">name</span>=<span class="t-val">"viewport"</span> <span class="t-attr">content</span>=<span class="t-val">"width=device-width, initial-scale=1.0"</span><span class="t-tag">&gt;</span>
+  <span class="t-tag">&lt;meta</span> <span class="t-attr">name</span>=<span class="t-val">"description"</span> <span class="t-attr">content</span>=<span class="t-val">"My multilingual app"</span><span class="t-tag">&gt;</span>
+  <span class="t-tag">&lt;title&gt;</span>My App<span class="t-tag">&lt;/title&gt;</span>
+  <span class="t-tag">&lt;style&gt;</span>
+    <span class="t-cmt">/* ── Reset ── */</span>
+    <span class="t-prop">*</span> { <span class="t-attr">box-sizing</span>: border-box; <span class="t-attr">margin</span>: 0; <span class="t-attr">padding</span>: 0; }
+    <span class="t-prop">html</span> { <span class="t-attr">scroll-behavior</span>: smooth; }
+    <span class="t-prop">body</span> {
+      <span class="t-attr">font-family</span>: system-ui, -apple-system, sans-serif;
+      <span class="t-attr">background</span>: #0f1117; <span class="t-attr">color</span>: #e2e8f0; <span class="t-attr">line-height</span>: 1.6;
+    }
+
+    <span class="t-cmt">/* ── Navbar ── */</span>
+    <span class="t-prop">header</span> {
+      <span class="t-attr">position</span>: sticky; <span class="t-attr">top</span>: 0; <span class="t-attr">z-index</span>: 100;
+      <span class="t-attr">background</span>: rgba(15,17,23,0.85);
+      <span class="t-attr">backdrop-filter</span>: blur(12px);
+      <span class="t-attr">border-bottom</span>: 1px solid rgba(255,255,255,0.07);
+    }
+    <span class="t-prop">nav</span> {
+      <span class="t-attr">max-width</span>: 1140px; <span class="t-attr">margin</span>: 0 auto;
+      <span class="t-attr">display</span>: flex; <span class="t-attr">align-items</span>: center;
+      <span class="t-attr">gap</span>: 32px; <span class="t-attr">padding</span>: 14px 24px;
+    }
+    <span class="t-prop">.nav-logo</span> { <span class="t-attr">font-weight</span>: 700; <span class="t-attr">font-size</span>: 18px; <span class="t-attr">color</span>: #fff; <span class="t-attr">text-decoration</span>: none; }
+    <span class="t-prop">.nav-links</span> { <span class="t-attr">display</span>: flex; <span class="t-attr">gap</span>: 24px; <span class="t-attr">flex</span>: 1; }
+    <span class="t-prop">.nav-links a</span> { <span class="t-attr">color</span>: #94a3b8; <span class="t-attr">text-decoration</span>: none; <span class="t-attr">font-size</span>: 14px; <span class="t-attr">transition</span>: color .15s; }
+    <span class="t-prop">.nav-links a:hover</span> { <span class="t-attr">color</span>: #fff; }
+
+    <span class="t-cmt">/* ── Hero ── */</span>
+    <span class="t-prop">.hero</span> {
+      <span class="t-attr">max-width</span>: 1140px; <span class="t-attr">margin</span>: 80px auto; <span class="t-attr">padding</span>: 0 24px;
+      <span class="t-attr">text-align</span>: center;
+    }
+    <span class="t-prop">.hero h1</span> { <span class="t-attr">font-size</span>: clamp(32px, 5vw, 56px); <span class="t-attr">font-weight</span>: 800; <span class="t-attr">margin-bottom</span>: 16px; }
+    <span class="t-prop">.hero p</span>  { <span class="t-attr">color</span>: #94a3b8; <span class="t-attr">font-size</span>: 18px; <span class="t-attr">max-width</span>: 560px; <span class="t-attr">margin</span>: 0 auto; }
+  <span class="t-tag">&lt;/style&gt;</span>
+<span class="t-tag">&lt;/head&gt;</span>
+<span class="t-tag">&lt;body&gt;</span>
+
+<span class="t-tag">&lt;header&gt;</span>
+  <span class="t-tag">&lt;nav&gt;</span>
+    <span class="t-tag">&lt;a</span> <span class="t-attr">href</span>=<span class="t-val">"/"</span> <span class="t-attr">class</span>=<span class="t-val">"nav-logo"</span><span class="t-tag">&gt;</span>MyApp<span class="t-tag">&lt;/a&gt;</span>
+    <span class="t-tag">&lt;div</span> <span class="t-attr">class</span>=<span class="t-val">"nav-links"</span><span class="t-tag">&gt;</span>
+      <span class="t-tag">&lt;a</span> <span class="t-attr">href</span>=<span class="t-val">"/"</span><span class="t-tag">&gt;</span>Features<span class="t-tag">&lt;/a&gt;</span>
+      <span class="t-tag">&lt;a</span> <span class="t-attr">href</span>=<span class="t-val">"/pricing"</span><span class="t-tag">&gt;</span>Pricing<span class="t-tag">&lt;/a&gt;</span>
+      <span class="t-tag">&lt;a</span> <span class="t-attr">href</span>=<span class="t-val">"/docs"</span><span class="t-tag">&gt;</span>Docs<span class="t-tag">&lt;/a&gt;</span>
+      <span class="t-tag">&lt;a</span> <span class="t-attr">href</span>=<span class="t-val">"/contact"</span><span class="t-tag">&gt;</span>Contact<span class="t-tag">&lt;/a&gt;</span>
+    <span class="t-tag">&lt;/div&gt;</span>
+    <span class="t-cmt">&lt;!-- Language switcher — translate="no" keeps it from being translated --&gt;</span>
+    <span class="t-tag">&lt;div</span>
+      <span class="t-attr">data-type</span>=<span class="t-val">"foxLang"</span>
+      <span class="t-attr">data-theme</span>=<span class="t-val">"auto"</span>
+      <span class="t-attr">data-value</span>=<span class="t-val">"EN,TR,DE,FR,ES,AR,RU,ZH-CN"</span>
+      <span class="t-attr">data-selectoption</span>=<span class="t-val">"flag,iso2"</span>
+      <span class="t-attr">data-listoption</span>=<span class="t-val">"flag,iso2,name,en-name"</span>
+      <span class="t-attr">data-option</span>=<span class="t-val">"yes-auto-translate,yes-first-lang-browser"</span>
+      <span class="t-attr">data-class</span>=<span class="t-val">"foxLang"</span>
+      <span class="t-attr">translate</span>=<span class="t-val">"no"</span>
+      <span class="t-attr">class</span>=<span class="t-val">"notranslate"</span>
+    <span class="t-tag">&gt;&lt;/div&gt;</span>
+  <span class="t-tag">&lt;/nav&gt;</span>
+<span class="t-tag">&lt;/header&gt;</span>
+
+<span class="t-tag">&lt;main&gt;</span>
+  <span class="t-tag">&lt;section</span> <span class="t-attr">class</span>=<span class="t-val">"hero"</span><span class="t-tag">&gt;</span>
+    <span class="t-tag">&lt;h1&gt;</span>Welcome to MyApp<span class="t-tag">&lt;/h1&gt;</span>
+    <span class="t-tag">&lt;p&gt;</span>A blazing-fast, multilingual product — now available in your language.<span class="t-tag">&lt;/p&gt;</span>
+  <span class="t-tag">&lt;/section&gt;</span>
+<span class="t-tag">&lt;/main&gt;</span>
+
+<span class="t-cmt">&lt;!-- translator.js — load just before &lt;/body&gt; --&gt;</span>
+<span class="t-tag">&lt;script</span> <span class="t-attr">src</span>=<span class="t-val">"https://cdn.foxdim.com/repo/foxdim/libs/translate/lastest/translator.min.js"</span><span class="t-tag">&gt;&lt;/script&gt;</span>
+<span class="t-tag">&lt;/body&gt;</span>
+<span class="t-tag">&lt;/html&gt;</span></pre>
+    </div>
+
+    <!-- Language Codes -->
+    <h2 id="languages">Language Codes</h2>
+    <p>Pass any of the following codes (case-insensitive) to <code>data-value</code>. The full modal always lists all supported languages regardless of this list.</p>
+    <div class="callout callout-info">
+      <span class="callout-icon">ℹ️</span>
+      <div class="callout-body">Language variants are supported: <code>zh-CN</code>, <code>zh-TW</code>, <code>fr-CA</code>, <code>fa-AF</code>, etc. The library normalizes <code>en-US</code> → <code>en</code>, <code>de-AT</code> → <code>de</code> automatically.</div>
+    </div>
+    <div class="pre-wrap">
+      <button class="copy-btn" onclick="copyPre(this)">⎘ Copy</button>
+      <pre>af  ak  am  ar  as  ay  az  ba  be  bg  bho bi  bm  bn
+bs  ca  ce  cs  cy  da  de  dv  dz  ee  el  en  eo  es  et
+eu  fa  fi  fj  fo  fr  fy  ga  gl  gu  he  hi  hr  ht  hu
+hy  id  ig  is  it  iu  ja  ka  kk  km  kn  ko  ku  ky  la
+lb  lg  ln  lo  lt  lv  mg  mi  mk  ml  mn  mr  ms  mt  my
+ne  nl  no  ny  or  pa  pl  ps  pt  qu  rm  rn  ro  ru  rw
+sa  sd  sg  si  sk  sl  sm  sn  so  sq  sr  ss  st  su  sv
+sw  ta  te  tg  th  ti  tk  tl  tn  tr  ts  tt  ug  uk
+ur  uz  ve  vi  wa  xh  yi  yo  zh-CN  zh-TW  zu</pre>
+    </div>
+
+  </main>
+</div>
+
+<script src="https://cdn.foxdim.com/repo/foxdim/libs/translate/lastest/translator.min.js"></script>
+<script>
+function copyPre(btn) {
+  const pre = btn.nextElementSibling;
+  navigator.clipboard.writeText(pre.innerText).then(() => {
+    btn.textContent = '✓ Copied!';
+    btn.classList.add('copied');
+    setTimeout(() => { btn.textContent = '⎘ Copy'; btn.classList.remove('copied'); }, 2000);
+  });
+}
+function copyText(text, btn) {
+  navigator.clipboard.writeText(text).then(() => {
+    const original = btn.dataset.original || btn.textContent;
+    btn.dataset.original = original;
+    btn.textContent = '✓ Copied';
+    btn.classList.add('copied');
+    setTimeout(() => {
+      btn.textContent = original;
+      btn.classList.remove('copied');
+    }, 2000);
+  });
+}
+
+const sidebarLinks = Array.from(document.querySelectorAll('.sidebar a[href^="#"]'));
+const sidebarSections = sidebarLinks
+  .map((link) => {
+    const id = link.getAttribute('href').slice(1);
+    const el = document.getElementById(id);
+    return el ? { id, link, el } : null;
+  })
+  .filter(Boolean)
+  .sort((a, b) => a.el.offsetTop - b.el.offsetTop);
+
+const mobileMenu = document.getElementById('doc-mobile-menu');
+
+function setActiveSection(sectionId) {
+  sidebarSections.forEach(({ id, link }) => {
+    link.classList.toggle('active', id === sectionId);
+  });
+  if (mobileMenu && sectionId) {
+    mobileMenu.value = sectionId;
+  }
+}
+
+function updateActiveSectionByScroll() {
+  const scrollY = window.scrollY + 140;
+  let activeId = sidebarSections.length ? sidebarSections[0].id : '';
+
+  for (const section of sidebarSections) {
+    if (section.el.offsetTop <= scrollY) {
+      activeId = section.id;
+    }
+  }
+
+  setActiveSection(activeId);
+}
+
+let scrollTicking = false;
+window.addEventListener('scroll', () => {
+  if (scrollTicking) return;
+  scrollTicking = true;
+  requestAnimationFrame(() => {
+    updateActiveSectionByScroll();
+    scrollTicking = false;
+  });
+}, { passive: true });
+
+window.addEventListener('resize', updateActiveSectionByScroll);
+window.addEventListener('hashchange', () => {
+  const hashId = (window.location.hash || '').replace('#', '');
+  if (hashId) setActiveSection(hashId);
+});
+
+updateActiveSectionByScroll();
+</script>
+</body>
+</html>
