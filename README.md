@@ -33,7 +33,7 @@ Include the script before `</body>`:
 
 ```html
 <!-- Docs CDN (development) -->
-<script src="https://cdn.foxdim.com/repo/foxdim/libs/translate/"></script>
+<a href="https://cdn.foxdim.com/repo/foxdim/libs/translate/">https://cdn.foxdim.com/repo/foxdim/libs/translate/</a>
 ```
 
 ```html
